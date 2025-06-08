@@ -1,9 +1,22 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
+from PIL import Image
 import preprocessor, helper
 
-st.sidebar.title("Whatsapp Chat Analyzer")
+st.set_page_config(
+    page_title="WhatsApp Chat Analyzer",
+    page_icon="favicon.jpg",
+    layout="wide"
+)
+
+logo = Image.open("logo.png")
+col1, col2 = st.sidebar.columns([1, 4])
+with col1:
+    st.image(logo, width=40)
+with col2:
+    st.markdown("### Whatsapp Chat Analyzer")
+
 
 uploaded_file = st.sidebar.file_uploader("Choose a file")
 
@@ -12,7 +25,7 @@ if uploaded_file is not None:
     data = bytes_data.decode("utf-8")
     df = preprocessor.preprocess(data)
 
-    # st.dataframe(df)
+    #st.dataframe(df)
 
     #User list in the chat
     user_list = df['user'].unique().tolist()
@@ -164,5 +177,3 @@ if uploaded_file is not None:
             fig, ax = plt.subplots()
             ax.pie(emoji_df[1].head(),labels=emoji_df[0].head(),autopct="%0.2f")
             st.pyplot(fig)
-
-
