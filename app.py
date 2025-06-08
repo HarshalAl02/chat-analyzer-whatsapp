@@ -2,6 +2,9 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
 from PIL import Image
+from fpdf import FPDF
+import tempfile
+import os
 import preprocessor, helper
 import time
 
@@ -18,7 +21,7 @@ with col1:
 with col2:
     st.markdown("### Whatsapp Chat Analyzer")
 
-#File input or sample checkbox
+#file input or sample checkbox
 use_sample = st.sidebar.checkbox("Use Sample Chat")
 uploaded_file = None if use_sample else st.sidebar.file_uploader("Choose a file")
 
@@ -33,12 +36,39 @@ elif uploaded_file is not None:
     bytes_data = uploaded_file.getvalue()
     data = bytes_data.decode("utf-8")
 
-#proceeding only if data is available
+#temporary directory to save plots for PDF
+plot_paths = []
+temp_dir = tempfile.mkdtemp()
+
+def save_plot(fig, name):
+    path = os.path.join(temp_dir, name)
+    fig.savefig(path, bbox_inches='tight')
+    plot_paths.append(path)
+    plt.close(fig)
+
+#PDF report helper class
+class PDFReport(FPDF):
+    def header(self):
+        self.set_font("Arial", 'B', 12)
+        self.cell(0, 10, 'WhatsApp Chat Analysis Report', 0, 1, 'C')
+        self.ln(5)
+
+    def add_stat(self, title, value):
+        self.set_font("Arial", 'B', 11)
+        self.cell(40, 10, f"{title}: {value}", ln=1)
+
+    def add_image(self, path, title):
+        self.set_font("Arial", 'B', 12)
+        self.cell(0, 10, title, ln=1)
+        self.image(path, w=180)
+        self.ln(10)
+
 if data is not None:
     df = preprocessor.preprocess(data)
 
     user_list = df['user'].unique().tolist()
-    user_list.remove('group_notification')
+    if 'group_notification' in user_list:
+        user_list.remove('group_notification')
     user_list.sort()
     user_list.insert(0, "Overall")
 
@@ -68,6 +98,13 @@ if data is not None:
         progress.empty()
 
         num_messages, words, media_message_count, links_count = helper.fetch_stats(selected_user, df)
+
+        pdf = PDFReport()
+        pdf.add_page()
+        pdf.add_stat("Total Messages", num_messages)
+        pdf.add_stat("Total Words", words)
+        pdf.add_stat("Shared Media", media_message_count)
+        pdf.add_stat("Shared Links", links_count)
 
         st.title("Top Statistics")
         column1, column2, column3, column4 = st.columns(4)
@@ -100,6 +137,7 @@ if data is not None:
         ax.set_ylabel('Message Count', color='#2c3e50')
         plt.tight_layout()
         st.pyplot(fig)
+        save_plot(fig, "monthly_timeline.png")
 
         #Daily Timeline
         st.title("Daily Timeline")
@@ -112,6 +150,7 @@ if data is not None:
         ax.set_facecolor('#fafafa')
         plt.tight_layout()
         st.pyplot(fig)
+        save_plot(fig, "daily_timeline.png")
 
         #Activity Map
         st.title('Activity Map')
@@ -123,6 +162,7 @@ if data is not None:
             ax.bar(busy_day.index, busy_day.values)
             plt.xticks(rotation=45, color='#2c3e50')
             st.pyplot(fig)
+            save_plot(fig, "busy_day.png")
         with column2:
             st.header("Most Busy Month")
             busy_month = helper.month_activity_map(selected_user, df)
@@ -130,12 +170,15 @@ if data is not None:
             ax.bar(busy_month.index, busy_month.values, color='#6c5ce7')
             plt.xticks(rotation=45, color='#2c3e50')
             st.pyplot(fig)
+            save_plot(fig, "busy_month.png")
 
+        #Weekly Activity Map
         st.title("Weekly Activity Map")
         user_heatmap = helper.activity_heatmap(selected_user, df)
         fig, ax = plt.subplots()
         ax = sns.heatmap(user_heatmap)
         st.pyplot(fig)
+        save_plot(fig, "weekly_activity_heatmap.png")
 
         #Most engaged users
         if selected_user == 'Overall':
@@ -147,6 +190,7 @@ if data is not None:
                 ax.bar(x.index, x.values, color='#4a90e2')
                 plt.xticks(rotation='vertical')
                 st.pyplot(fig)
+                save_plot(fig, "most_engaged_users.png")
             with column2:
                 st.dataframe(new_df)
 
@@ -155,7 +199,9 @@ if data is not None:
         df_wc = helper.create_wordcloud(selected_user, df)
         fig, ax = plt.subplots()
         ax.imshow(df_wc)
+        ax.axis('off')
         st.pyplot(fig)
+        save_plot(fig, "wordcloud.png")
 
         #Most common words
         most_common_df = helper.most_common_words(selected_user, df)
@@ -164,6 +210,7 @@ if data is not None:
         plt.xticks(rotation='vertical')
         st.title("Most Common Words")
         st.pyplot(fig)
+        save_plot(fig, "most_common_words.png")
 
         #Emoji analysis
         emoji_df = helper.emoji_counting(selected_user, df)
@@ -175,3 +222,19 @@ if data is not None:
             fig, ax = plt.subplots()
             ax.pie(emoji_df[1].head(), labels=emoji_df[0].head(), autopct="%0.2f")
             st.pyplot(fig)
+            save_plot(fig, "emoji_analysis.png")
+
+        #adding all saved plots to PDF
+        for path in plot_paths:
+            title = os.path.splitext(os.path.basename(path))[0].replace('_', ' ').title()
+            pdf.add_page()
+            pdf.add_image(path, title)
+
+        #save and serve PDF file
+        final_pdf_path = os.path.join(temp_dir, "chat_report.pdf")
+        pdf.output(final_pdf_path)
+
+        with open(final_pdf_path, "rb") as f:
+            st.download_button("📄 Download PDF Report", f, file_name="WhatsApp_Chat_Report.pdf")
+
+        st.success("✅ PDF report generated!")
