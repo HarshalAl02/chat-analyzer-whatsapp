@@ -64,7 +64,15 @@ class PDFReport(FPDF):
         self.ln(10)
 
 if data is not None:
-    df = preprocessor.preprocess(data)
+    try:
+        df = preprocessor.preprocess(data)
+
+        if df.empty or 'user' not in df.columns or 'message' not in df.columns:
+            raise ValueError("Invalid chat format.")
+
+    except Exception as e:
+        st.error("❌ Error: The uploaded file doesn't seem to be a valid WhatsApp chat export.")
+        st.stop()
 
     user_list = df['user'].unique().tolist()
     if 'group_notification' in user_list:
