@@ -207,7 +207,7 @@ if data is not None:
         df_wc = helper.create_wordcloud(selected_user, df)
         fig, ax = plt.subplots()
         ax.imshow(df_wc)
-        ax.axis('off')
+        #ax.axis('off')
         st.pyplot(fig)
         save_plot(fig, "wordcloud.png")
 
