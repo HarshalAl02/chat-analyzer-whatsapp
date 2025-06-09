@@ -4,6 +4,7 @@ seaborn
 urlextract
 wordcloud
 pandas
-emoji==1.6.3
+emoji
 Pillow
 fpdf
+plotly
