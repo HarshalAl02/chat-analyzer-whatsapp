@@ -7,6 +7,8 @@ import tempfile
 import os
 import preprocessor, helper
 import time
+import math
+import plotly.express as px
 
 st.set_page_config(
     page_title="WhatsApp Chat Analyzer",
@@ -63,9 +65,24 @@ class PDFReport(FPDF):
         self.image(path, w=180)
         self.ln(10)
 
+#animated stat values display
+def display_stats_value(final_value, duration=1.2, steps=60, unit=""):
+    placeholder = st.empty()
+    increment = max(1,math.ceil(final_value / steps))
+
+    for val in range(0, final_value, increment):
+        placeholder.title(f"{val}{unit}")
+        time.sleep(duration/steps)
+    placeholder.title(f"{final_value}{unit}")
+
+@st.cache_data(show_spinner="🔄 Preprocessing chat...")
+def load_and_preprocess(data):
+    return preprocessor.preprocess(data)
+
+
 if data is not None:
     try:
-        df = preprocessor.preprocess(data)
+        df = load_and_preprocess(data)
 
         if df.empty or 'user' not in df.columns or 'message' not in df.columns:
             raise ValueError("Invalid chat format.")
@@ -118,16 +135,16 @@ if data is not None:
         column1, column2, column3, column4 = st.columns(4)
         with column1:
             st.header("Total Message")
-            st.title(num_messages)
+            display_stats_value(num_messages)
         with column2:
             st.header("Total Words")
-            st.title(words)
+            display_stats_value(words)
         with column3:
             st.header("Shared Media")
-            st.title(media_message_count)
+            display_stats_value(media_message_count, unit=" 📷")
         with column4:
             st.header("Shared Links")
-            st.title(links_count)
+            display_stats_value(links_count, unit=" 🔗")
 
         #Monthly Timeline
         st.title("Monthly Timeline")
@@ -144,8 +161,11 @@ if data is not None:
         ax.set_xlabel('Month', color='#2c3e50')
         ax.set_ylabel('Message Count', color='#2c3e50')
         plt.tight_layout()
-        st.pyplot(fig)
+        #st.pyplot(fig)
         save_plot(fig, "monthly_timeline.png")
+        fig = px.line(timeline, x='time', y='message', markers=True)
+        fig = helper.create_custom_plotly_line(timeline, 'time', 'message', 'Messages Over Time', 'Month', 'Message Count')
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
         #Daily Timeline
         st.title("Daily Timeline")
@@ -157,8 +177,11 @@ if data is not None:
         fig.patch.set_facecolor('#fafafa')
         ax.set_facecolor('#fafafa')
         plt.tight_layout()
-        st.pyplot(fig)
+        #st.pyplot(fig)
         save_plot(fig, "daily_timeline.png")
+        fig = helper.create_custom_plotly_daily_line(daily_timeline, 'date_for_timeline', 'message', 'Messages Over Days', 'Date', 'Message Count')
+        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+
 
         #Activity Map
         st.title('Activity Map')
@@ -167,18 +190,23 @@ if data is not None:
             st.header("Most Busy Day")
             busy_day = helper.week_activity_map(selected_user, df)
             fig, ax = plt.subplots()
-            ax.bar(busy_day.index, busy_day.values)
+            ax.bar(busy_day.index, busy_day.values, color='#6c5ce7')
             plt.xticks(rotation=45, color='#2c3e50')
-            st.pyplot(fig)
+            #st.pyplot(fig)
             save_plot(fig, "busy_day.png")
+            fig = helper.create_custom_activity_map(busy_day, "Most Busy Day", "Day", "Messages")
+            st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+
         with column2:
             st.header("Most Busy Month")
             busy_month = helper.month_activity_map(selected_user, df)
             fig, ax = plt.subplots()
             ax.bar(busy_month.index, busy_month.values, color='#6c5ce7')
             plt.xticks(rotation=45, color='#2c3e50')
-            st.pyplot(fig)
+            #st.pyplot(fig)
             save_plot(fig, "busy_month.png")
+            fig = helper.create_custom_activity_map(busy_month, "Most Busy Month", "Month", "Messages")
+            st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
         #Weekly Activity Map
         st.title("Weekly Activity Map")
@@ -195,10 +223,12 @@ if data is not None:
             fig, ax = plt.subplots()
             column1, column2 = st.columns(2)
             with column1:
-                ax.bar(x.index, x.values, color='#4a90e2')
-                plt.xticks(rotation='vertical')
-                st.pyplot(fig)
+                ax.bar(x.index, x.values, color='#6c5ce7')
+                plt.xticks(rotation=45)
+                #st.pyplot(fig)
                 save_plot(fig, "most_engaged_users.png")
+                fig = helper.create_custom_activity_map(x, "Most engaged users", "Users", "Messages")
+                st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
             with column2:
                 st.dataframe(new_df)
 
@@ -217,8 +247,10 @@ if data is not None:
         ax.barh(most_common_df[0], most_common_df[1])
         plt.xticks(rotation='vertical')
         st.title("Most Common Words")
-        st.pyplot(fig)
+        #st.pyplot(fig)
         save_plot(fig, "most_common_words.png")
+        fig = helper.create_custom_horizontal_bar(most_common_df, "Most Common Words")
+        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
         #Emoji analysis
         emoji_df = helper.emoji_counting(selected_user, df)
