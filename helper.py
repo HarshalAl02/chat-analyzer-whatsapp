@@ -138,3 +138,179 @@ def activity_heatmap(selected_user,df):
     user_heatmap = df.pivot_table(index='day_name', columns='period', values='message', aggfunc='count').fillna(0)
 
     return user_heatmap
+
+
+def create_custom_plotly_line(timeline_df, x_col, y_col, title, xlabel, ylabel):
+    import plotly.graph_objects as go
+
+    x_vals = timeline_df[x_col]
+    xticks = list(x_vals[::3])  # Convert to list for Plotly
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=x_vals,
+        y=timeline_df[y_col],
+        mode='lines+markers',
+        line=dict(color='#9b59b6'),
+        marker=dict(symbol='circle', size=8, color='#9b59b6'),
+        hovertemplate='%{x}<br>Messages: %{y}<extra></extra>'
+    ))
+
+    fig.update_layout(
+        width=1200,
+        height=600,
+        plot_bgcolor='#f4f4f4',
+        paper_bgcolor='#f4f4f4',
+        title=dict(text=title, font=dict(size=16, color='#2c3e50'), x=0.5, xanchor='center'),
+        xaxis=dict(
+            title=dict(text=xlabel, font=dict(color='#2c3e50')),
+            tickvals=xticks,
+            ticktext=[str(x) for x in xticks],
+            tickangle=-45,
+            tickfont=dict(color='#2c3e50'),
+            showgrid=False,
+            zeroline=False,
+            linecolor='#2c3e50',
+            mirror=True,
+            automargin=True,
+        ),
+        yaxis=dict(
+            title=dict(text=ylabel, font=dict(color='#2c3e50')),
+            tickfont=dict(color='#2c3e50'),
+            showgrid=False,
+            zeroline=False,
+            linecolor='#2c3e50',
+            mirror=True,
+            automargin=True,
+        ),
+        margin=dict(l=60, r=40, t=60, b=60)
+    )
+
+    return fig
+
+def create_custom_plotly_daily_line(timeline_df, x_col, y_col, title, xlabel, ylabel):
+    import plotly.graph_objects as go
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=timeline_df[x_col],
+        y=timeline_df[y_col],
+        mode='lines',
+        line=dict(color='#9b59b6'),
+        hovertemplate='%{x}<br>Messages: %{y}<extra></extra>'
+    ))
+
+    fig.update_layout(
+        width=900,
+        height=500,
+        plot_bgcolor='#fafafa',
+        paper_bgcolor='#fafafa',
+        title=dict(
+            text=title,
+            font=dict(size=16, color='#2c3e50'),
+            x=0.5,
+            xanchor='center'
+        ),
+        xaxis=dict(
+            title=dict(text=xlabel, font=dict(color='black')),  # Explicit label color
+            tickangle=90,
+            tickfont=dict(color='#2c3e50'),
+            showgrid=False,
+            zeroline=False,
+            linecolor='#2c3e50',
+            mirror=True,
+        ),
+        yaxis=dict(
+            title=dict(text=ylabel, font=dict(color='black')),  # Explicit label color
+            tickfont=dict(color='#2c3e50'),
+            showgrid=False,
+            zeroline=False,
+            linecolor='#2c3e50',
+            mirror=True,
+        ),
+        margin=dict(l=60, r=40, t=60, b=80)
+    )
+
+    return fig
+
+
+def create_custom_activity_map(data_series, title, xlabel, ylabel):
+    import plotly.graph_objects as go
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=data_series.index,
+        y=data_series.values,
+        marker=dict(color='#6c5ce7'),
+        hovertemplate='%{x}<br>Messages: %{y}<extra></extra>'
+    ))
+
+    fig.update_layout(
+        width=900,
+        height=500,
+        plot_bgcolor='#fafafa',
+        paper_bgcolor='#fafafa',
+        title=dict(text=title, font=dict(size=16, color='#2c3e50'), x=0.5, xanchor='center'),
+        xaxis=dict(
+            title=dict(text=xlabel, font=dict(color='black')),  # Explicit black label
+            tickangle=45,
+            tickfont=dict(color='#2c3e50'),
+            showgrid=False,
+            zeroline=False,
+            linecolor='#2c3e50',
+            mirror=True,
+        ),
+        yaxis=dict(
+            title=dict(text=ylabel, font=dict(color='black')),  # Explicit black label
+            tickfont=dict(color='#2c3e50'),
+            showgrid=False,
+            zeroline=False,
+            linecolor='#2c3e50',
+            mirror=True,
+        ),
+        margin=dict(l=60, r=40, t=60, b=60)
+    )
+
+    return fig
+
+def create_custom_horizontal_bar(data_df, title):
+    import plotly.graph_objects as go
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        y=data_df[0],
+        x=data_df[1],
+        orientation='h',
+        marker=dict(color='#1f77b4'),  # Default matplotlib blue
+        hovertemplate='%{y}<br>Count: %{x}<extra></extra>'
+    ))
+
+    fig.update_layout(
+        width=900,
+        height=600,
+        bargap=0.3,  # Adds spacing between bars
+        plot_bgcolor='#fafafa',
+        paper_bgcolor='#fafafa',
+        title=dict(text=title, font=dict(size=16, color='#2c3e50'), x=0.5, xanchor='center'),
+        xaxis=dict(
+            tickfont=dict(color='#2c3e50'),
+            showgrid=False,
+            zeroline=False,
+            linecolor='#2c3e50',
+            mirror=True
+        ),
+        yaxis=dict(
+            tickfont=dict(color='#2c3e50', size=14),
+            showgrid=False,
+            zeroline=False,
+            linecolor='#2c3e50',
+            mirror=True
+        ),
+        margin=dict(l=100, r=40, t=60, b=60)
+    )
+
+    return fig
