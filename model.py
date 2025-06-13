@@ -15,7 +15,11 @@ label_map = {
     "casual": "Casual 😁"
 }
 
-def classify_tone(df):
+def classify_tone(df, selected_user):
+
+    if selected_user != "Overall":
+        df = df[df['user'] == selected_user]
+
     df['message'] = df['message'].astype(str).str.lower().fillna('').str.strip()
     df = df[df['message'] != '']
 
