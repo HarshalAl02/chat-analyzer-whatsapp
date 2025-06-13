@@ -9,6 +9,7 @@ import preprocessor, helper
 import time
 import math
 import plotly.express as px
+from model import classify_tone
 
 st.set_page_config(
     page_title="WhatsApp Chat Analyzer",
@@ -83,6 +84,7 @@ def load_and_preprocess(data):
 if data is not None:
     try:
         df = load_and_preprocess(data)
+        #st.dataframe(df)
 
         if df.empty or 'user' not in df.columns or 'message' not in df.columns:
             raise ValueError("Invalid chat format.")
@@ -263,6 +265,44 @@ if data is not None:
             ax.pie(emoji_df[1].head(), labels=emoji_df[0].head(), autopct="%0.2f")
             st.pyplot(fig)
             save_plot(fig, "emoji_analysis.png")
+
+        #Message Tone Classification
+        tone_df = classify_tone(df)
+
+        tone_counts = tone_df['chat_type'].value_counts()
+
+        st.title("Message Tone Analysis")
+        st.markdown("### 🧪 Chat Tone Detection (Beta Feature)")
+        st.info("This feature classifies message tones using a trained ML model. Results may vary depending on language mix, abbreviations, or slang.")
+
+        column1, column2 = st.columns(2)
+
+        with column1:
+            st.subheader("Tone Distribution Donut Chart")
+
+            fig, ax = plt.subplots(figsize=(7, 7))
+            colors = plt.cm.Pastel1.colors
+
+            wedges, texts, autotexts = ax.pie(
+                tone_counts,
+                labels=tone_counts.index,
+                autopct='%1.1f%%',
+                startangle=90,
+                colors=colors,
+                wedgeprops={'width': 0.6, 'edgecolor': 'white'}  # smaller center hole
+            )
+
+            ax.axis('equal')
+
+            st.pyplot(fig)
+            save_plot(fig, "tone_donut_chart.png")
+
+        with column2:
+            st.subheader("Tone Counts Table")
+            tone_counts_df = tone_counts.reset_index()
+            tone_counts_df.columns = ['Tone', 'Messages']
+            st.dataframe(tone_counts_df)
+
 
         #adding all saved plots to PDF
         for path in plot_paths:
