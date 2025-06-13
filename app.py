@@ -267,7 +267,7 @@ if data is not None:
             save_plot(fig, "emoji_analysis.png")
 
         #Message Tone Classification
-        tone_df = classify_tone(df)
+        tone_df = classify_tone(df, selected_user)
 
         tone_counts = tone_df['chat_type'].value_counts()
 
@@ -289,7 +289,7 @@ if data is not None:
                 autopct='%1.1f%%',
                 startangle=90,
                 colors=colors,
-                wedgeprops={'width': 0.6, 'edgecolor': 'white'}  # smaller center hole
+                wedgeprops={'width': 0.6, 'edgecolor': 'white'}
             )
 
             ax.axis('equal')
