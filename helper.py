@@ -144,7 +144,7 @@ def create_custom_plotly_line(timeline_df, x_col, y_col, title, xlabel, ylabel):
     import plotly.graph_objects as go
 
     x_vals = timeline_df[x_col]
-    xticks = list(x_vals[::3])  # Convert to list for Plotly
+    xticks = list(x_vals[::3])
 
     fig = go.Figure()
 
@@ -214,7 +214,7 @@ def create_custom_plotly_daily_line(timeline_df, x_col, y_col, title, xlabel, yl
             xanchor='center'
         ),
         xaxis=dict(
-            title=dict(text=xlabel, font=dict(color='black')),  # Explicit label color
+            title=dict(text=xlabel, font=dict(color='black')),
             tickangle=90,
             tickfont=dict(color='#2c3e50'),
             showgrid=False,
@@ -223,7 +223,7 @@ def create_custom_plotly_daily_line(timeline_df, x_col, y_col, title, xlabel, yl
             mirror=True,
         ),
         yaxis=dict(
-            title=dict(text=ylabel, font=dict(color='black')),  # Explicit label color
+            title=dict(text=ylabel, font=dict(color='black')),
             tickfont=dict(color='#2c3e50'),
             showgrid=False,
             zeroline=False,
@@ -255,7 +255,7 @@ def create_custom_activity_map(data_series, title, xlabel, ylabel):
         paper_bgcolor='#fafafa',
         title=dict(text=title, font=dict(size=16, color='#2c3e50'), x=0.5, xanchor='center'),
         xaxis=dict(
-            title=dict(text=xlabel, font=dict(color='black')),  # Explicit black label
+            title=dict(text=xlabel, font=dict(color='black')),
             tickangle=45,
             tickfont=dict(color='#2c3e50'),
             showgrid=False,
@@ -285,14 +285,14 @@ def create_custom_horizontal_bar(data_df, title):
         y=data_df[0],
         x=data_df[1],
         orientation='h',
-        marker=dict(color='#1f77b4'),  # Default matplotlib blue
+        marker=dict(color='#1f77b4'),
         hovertemplate='%{y}<br>Count: %{x}<extra></extra>'
     ))
 
     fig.update_layout(
         width=900,
         height=600,
-        bargap=0.3,  # Adds spacing between bars
+        bargap=0.3,
         plot_bgcolor='#fafafa',
         paper_bgcolor='#fafafa',
         title=dict(text=title, font=dict(size=16, color='#2c3e50'), x=0.5, xanchor='center'),
