@@ -16,6 +16,11 @@ A powerful, interactive web application that lets you upload and analyze your pe
 - ☁️ Auto-generated **word cloud** and **most common words**
 - 😂 Emoji usage breakdown with **pie chart**
 - 🧊 Weekly activity heatmap
+- 🧠 **Chat Tone Classification** (Romantic, Sarcastic, Argumentative, Informational, Casual, etc.)
+- 📌 Filter all graphs and insights **per user** or **overall**
+- 📊 Interactive charts for timelines and activity
+- 🍩 Donut chart for chat tone distribution
+- 📦 Categorized bar charts for each tone over time
 - 📄 One-click **PDF Report** generation with embedded visualizations
 
 ---
@@ -33,7 +38,11 @@ A powerful, interactive web application that lets you upload and analyze your pe
 ├── Procfile
 ├── requirements.txt
 ├── sample_chat.txt
-└── stop_hinglish.txt
+├── stop_hinglish.txt
+├── model.py
+├── chat_classifier_model.pkl
+└── tfidf_vectorizer.pkl
+
 ```
 
 ---
@@ -71,6 +80,7 @@ The app generates a complete PDF summary of your chat analysis, including:
 - Word cloud
 - Emoji chart
 - Key statistics
+- 🎨 Includes tone-based visualizations like donut chart, and individual tone trends
 
 Just click the **“📄 Download PDF Report”** button after analyzing.
 
