@@ -18,11 +18,14 @@ st.set_page_config(
 )
 
 logo = Image.open("logo.png")
-col1, col2 = st.sidebar.columns([1, 4])
+col1, col2, col3 = st.columns([0.5, 6, 1])
 with col1:
     st.image(logo, width=40)
 with col2:
-    st.markdown("### Whatsapp Chat Analyzer")
+    st.markdown("<h3 style='padding-top: 10px;'>WhatsApp Chat Analyzer</h3>", unsafe_allow_html=True)
+with col3:
+    if st.button("❓"):
+        st.toast("Click (>>) to open the sidebar to access the menu", icon="ℹ️")
 
 #file input or sample checkbox
 use_sample = st.sidebar.checkbox("Use Sample Chat")
