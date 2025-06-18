@@ -95,6 +95,40 @@ Just click the **“📄 Download PDF Report”** button after analyzing.
 
 ---
 
+## 📝 How to Use
+
+### 📤 Step 1: Export WhatsApp Chat as `.txt` File
+
+To analyze your own WhatsApp chats, first export the conversation from your mobile device:
+
+#### ✅ For Android:
+1. Open the chat (individual or group) in **WhatsApp**
+2. Tap the **three-dot menu** (⋮) → **More** → **Export chat**
+3. Select **“Without media”** when prompted
+4. Choose where to save/share the file (e.g., Google Drive, Email, Files)
+5. You’ll get a `.txt` file — or sometimes a `.zip` file if sent via email or cloud
+
+#### ✅ For iPhone (iOS):
+1. Open the desired chat in **WhatsApp**
+2. Tap the **chat name** at the top → Scroll down → **Export Chat**
+3. Choose **“Without Media”**
+4. Save the file using Mail, Files, or another method
+5. You may receive a `.zip` file — download and extract it to get the `.txt` file inside
+
+> ⚠️ *Always choose "Without media" to keep the file small and clean.*  
+> 📦 *If you receive a `.zip` file, **extract it first** and use the `.txt` file inside.*
+
+---
+
+### 📥 Step 2: Upload and Analyze
+
+1. Open the app (locally or via [Live Demo](https://chat-analyzer-whatsapp.onrender.com))
+2. In the **sidebar**, click **“Browse files”** to upload your `.txt` chat file
+3. Or check **“Use Sample Chat”** to test the app without uploading
+4. Wait for the progress bar to finish – the app auto-detects and processes your chat format
+
+---
+
 ## ✨ Author
 
 **Harshal Alaspure**  
